@@ -12,9 +12,7 @@ module.exports = {
     }
     const payload = {
       title: b.title.trim(),
-      description: typeof b.description === "string" ? b.description : null,
       target_date: b.target_date ? String(b.target_date) : null,
-      position: typeof b.position === "number" ? b.position : 0,
     };
     const created = await service.create(payload);
     res.status(201).json(created);
@@ -22,15 +20,27 @@ module.exports = {
   async update(req, res) {
     const { id } = req.params;
     const b = req.body || {};
+
+    // 필드 구성: 전달된 키만 사용, target_date는 null로도 클리어 가능
     const patch = {
       ...(typeof b.title === "string" ? { title: b.title } : {}),
       ...(typeof b.completed === "boolean" ? { completed: b.completed } : {}),
-      ...(typeof b.description === "string" ? { description: b.description } : {}),
-      ...(typeof b.position === "number" ? { position: b.position } : {}),
-      ...(b.target_date ? { target_date: String(b.target_date) } : {}),
+      ...("target_date" in b ? { target_date: b.target_date ? String(b.target_date) : null } : {}),
     };
-    const updated = await service.update(id, patch);
-    res.json(updated);
+
+    if (Object.keys(patch).length === 0) {
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    try {
+      const updated = await service.update(id, patch);
+      res.json(updated);
+    } catch (err) {
+      if (err && err.message === "No valid fields to update") {
+        return res.status(400).json({ message: err.message });
+      }
+      throw err;
+    }
   },
   async toggle(req, res) {
     const { id } = req.params;
