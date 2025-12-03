@@ -6,7 +6,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [/^http:\/\/localhost:\d+$/],
+    origin: ["https://todo-list-front-end-mrvs.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
