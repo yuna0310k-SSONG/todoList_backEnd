@@ -3,16 +3,32 @@ const cors = require("cors");
 const todosRoutes = require("./routes/todos.routes");
 
 const app = express();
+// Strong CORS: reflect request origin when it matches our allowlist, otherwise block
+// const allowList = new Set(["https://todolist-backend-qvzu.onrender.com", "http://localhost:3000"]);
 
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && allowList.has(origin)) {
+    res.header("Access-Control-Allow-Origin", origin);
+    res.header("Vary", "Origin");
+    res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,DELETE,OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  }
+  // Short-circuit preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
+
+// Also apply cors middleware with permissive origin function to ensure header formatting
 app.use(
   cors({
-    origin: [/^http:\/\/localhost:\d+$/],
+    origin: ["https://todo-list-front-end-mrvs.vercel.app/"],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
-app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 app.use("/todos", todosRoutes);
