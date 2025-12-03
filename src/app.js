@@ -24,7 +24,7 @@ app.use((req, res, next) => {
 // Also apply cors middleware with permissive origin function to ensure header formatting
 app.use(
   cors({
-    origin: ["https://todo-list-front-end-mrvs.vercel.app/"],
+    origin: ["https://todo-list-front-end-mrvs.vercel.app"],
     methods: ["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
